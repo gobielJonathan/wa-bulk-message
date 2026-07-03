@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "WA Bulk Sender Pro",
+  "version": "1.0",
+  "description": "Automate WhatsApp messages safely.",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "tabs",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://web.whatsapp.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://web.whatsapp.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}

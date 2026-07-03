@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WA Sender Pro</title>
+  <script src="xlsx.full.min.js"></script>
+
+  <style>
+    body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  width: 320px;
+  margin: 0;
+  background-color: #f0f2f5;
+  color: #111b21;
+}
+.header {
+  background-color: #00a884;
+  color: white;
+  padding: 15px;
+  text-align: center;
+}
+.header h2 { margin: 0; font-size: 18px; }
+.container { padding: 15px; }
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.upload-btn {
+  display: block;
+  background-color: #f0f2f5;
+  border: 2px dashed #00a884;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: bold;
+  color: #00a884;
+}
+.upload-btn:hover { background-color: #e6f7f3; }
+.note { font-size: 11px; color: #666; margin: 8px 0 0 0; }
+.settings label { font-size: 12px; font-weight: bold; }
+.delay-inputs { display: flex; justify-content: space-around; margin-top: 8px; font-size: 13px;}
+.delay-inputs input { width: 50px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; }
+.stats { display: flex; justify-content: space-between; margin-bottom: 15px; }
+.stat-box { background: white; padding: 10px; border-radius: 8px; width: 30%; text-align: center; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.stat-box span { font-size: 16px; display: block; margin-top: 5px; }
+.success { color: #00a884; }
+.fail { color: #ea0038; }
+button {
+  width: 100%; padding: 12px; background-color: #00a884; color: white; border: none; border-radius: 24px; cursor: pointer; font-size: 14px; font-weight: bold;
+}
+button:disabled { background-color: #ccc; cursor: not-allowed; }
+#statusText { text-align: center; font-size: 12px; margin-top: 10px; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>WA Bulk Sender Pro 2</h2>
+  </div>
+  
+  <div class="container">
+    <div class="card">
+      <label class="upload-btn">
+        Upload Excel File (.xlsx)
+        <input type="file" id="excelFile" accept=".xlsx, .xls" hidden>
+      </label>
+      <p class="note">Columns needed: <b>Phone, Name, Message</b></p>
+    </div>
+
+    <div class="card settings">
+      <label>Random Delay (Seconds) to avoid ban:</label>
+      <div class="delay-inputs">
+        Min: <input type="number" id="minDelay" value="3" min="1">
+        Max: <input type="number" id="maxDelay" value="7" min="2">
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-box">Total<br><span id="totalCount">0</span></div>
+      <div class="stat-box success">Sent<br><span id="sentCount">0</span></div>
+      <div class="stat-box fail">Failed<br><span id="failCount">0</span></div>
+    </div>
+
+    <button id="startBtn" disabled>Start Campaign</button>
+    <div id="statusText">Awaiting file upload...</div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
