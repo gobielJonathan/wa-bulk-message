@@ -1,3 +1,5 @@
+import './style.css'
+
 let excelData = [];
 
 document.getElementById("excelFile").addEventListener("change", (e) => {
@@ -37,7 +39,7 @@ document.getElementById("excelFile").addEventListener("change", (e) => {
 document.getElementById("startBtn").addEventListener("click", () => {
   const minDelay = parseInt(document.getElementById("minDelay").value) * 1000;
   const maxDelay = parseInt(document.getElementById("maxDelay").value) * 1000;
-
+  
   chrome.runtime.sendMessage({
     action: "START_CAMPAIGN",
     data: excelData,
