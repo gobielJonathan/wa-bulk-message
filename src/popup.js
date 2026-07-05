@@ -1,4 +1,4 @@
-import './style.css'
+import "./style.css";
 
 let excelData = [];
 
@@ -19,13 +19,15 @@ document.getElementById("excelFile").addEventListener("change", (e) => {
         // Now only looking for "Phone" and "Message"
         const phone = row["Phone"] || row["phone"] || row["phone number"];
         const msg = row["Message"] || row["message"] || row["template message"];
+        const NIM = row["NIM"] || row["nim"] 
 
         return {
           phone: String(phone).replace(/\D/g, ""),
           message: msg,
+          NIM
         };
       })
-      .filter((row) => row.phone && row.message);
+      .filter((row) => [row.phone, row.message, row.NIM].filter(Boolean));
 
     document.getElementById("totalCount").innerText = excelData.length;
 
@@ -39,11 +41,11 @@ document.getElementById("excelFile").addEventListener("change", (e) => {
 document.getElementById("startBtn").addEventListener("click", () => {
   const minDelay = parseInt(document.getElementById("minDelay").value) * 1000;
   const maxDelay = parseInt(document.getElementById("maxDelay").value) * 1000;
-  
+
   chrome.runtime.sendMessage({
     action: "START_CAMPAIGN",
     data: excelData,
-    payload: { minDelay, maxDelay, contacts: excelData, },
+    payload: { minDelay, maxDelay, contacts: excelData },
   });
 
   document.getElementById("startBtn").disabled = true;
@@ -59,7 +61,18 @@ chrome.runtime.onMessage.addListener((msg) => {
     document.getElementById("statusText").innerText =
       `Processing: ${msg.sent}/${msg.total}`;
   }
-  if (msg.action === "CAMPAIGN_FINISHED") {
-    document.getElementById("statusText").innerText = "Campaign Finished!";
+
+  if (msg.sent + msg.failed === msg.total) {
+    document.getElementById("startBtn").disabled = false;
+    document.getElementById("statusText").innerText += " - COMPLETED!";
+
+    const tableContacts = document.querySelector('.failed-contacts-table tbody')
+    const rowTable = msg.failedContacts.map(contact => `
+        <tr>
+          <td>${contact.phone}</td>
+          <td>${contact.NIM}</td>
+        </tr>
+      `)
+    tableContacts.innerHTML = rowTable
   }
 });

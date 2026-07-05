@@ -1,13 +1,13 @@
 let queue = [];
 let config = {};
-let stats = { sent: 0, failed: 0, total: 0 };
+let stats = { sent: 0, failed: 0, total: 0, failedContacts: [] };
 let isRunning = false;
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "START_CAMPAIGN") {
         queue = request.payload.contacts; 
         config = request.payload;
-        stats = { sent: 0, failed: 0, total: queue.length };
+        stats = { sent: 0, failed: 0, total: queue.length, failedContacts: [] };
         
         if (!isRunning) {
             isRunning = true;
@@ -50,7 +50,10 @@ async function processNextMessage() {
                     files: ["content.js"]
                 }, () => {
                     if (chrome.runtime.lastError) {
-                        handleResponse({ success: false, error: "Script injection failed: " + chrome.runtime.lastError.message });
+                        handleResponse({ success: false, error: "Script injection failed: " + chrome.runtime.lastError.message, failedContacts: {
+                            phone: currentContact.phone,
+                            NIM: currentContact.NIM,
+                        } });
                         return;
                     }
                     // Wait half a second for script to boot, then retry
@@ -59,7 +62,10 @@ async function processNextMessage() {
                     }, 500);
                 });
             } else {
-                handleResponse(response);
+                handleResponse({...response, contact : {
+                    phone: currentContact.phone,
+                            NIM: currentContact.NIM,
+                        }});
             }
         });
 
@@ -68,6 +74,7 @@ async function processNextMessage() {
                 stats.failed++;
                 // Fallback string if err.message doesn't exist
                 const errorReason = chrome.runtime.lastError?.message || response?.error || "Unknown Error/Port Closed";
+                stats.failedContacts.push(response.contact)
                 console.error(`Failed to send to ${currentContact.phone}:`, errorReason);
             } else {
                 stats.sent++;
@@ -78,7 +85,8 @@ async function processNextMessage() {
                 action: "UPDATE_PROGRESS",
                 sent: stats.sent,
                 failed: stats.failed,
-                total: stats.total
+                total: stats.total,
+                failedContacts: stats.failedContacts
             }, () => {
                 if (chrome.runtime.lastError) { /* Ignore popup closed errors */ }
             });
