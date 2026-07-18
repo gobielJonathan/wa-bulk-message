@@ -44,7 +44,7 @@ if (typeof window.waSenderInjected === "undefined") {
 
     // --- STEP 2: Find Search Input and Type Number ---
     const searchInput = await waitForElement(
-      'input[aria-label="Search name, number or username"]',
+      'input[aria-label^="Search"]',
       5000,
     );
     if (!searchInput) throw new Error("Could not find search input.");
