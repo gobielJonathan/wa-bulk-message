@@ -42,6 +42,8 @@ if (typeof window.waSenderInjected === "undefined") {
     if (!newChatBtn) throw new Error("Could not find 'New Chat' button.");
     (newChatBtn.closest("button") || newChatBtn).click();
 
+    await sleep(2000)
+    
     // --- STEP 2: Find Search Input and Type Number ---
     const searchInput = await waitForElement(
       'input[aria-label^="Search"]',
@@ -56,13 +58,15 @@ if (typeof window.waSenderInjected === "undefined") {
 
     const isNotFound = await waitForElement(
       '[data-testid="search-no-results-without-keyword"]',
-      2000,
+      5000,
     );
     if (isNotFound) {
       const backBtn = document.querySelector('button[aria-label="Back"]');
       if (backBtn) (backBtn.closest("button") || backBtn).click();
       throw new Error("Number not registered or not found in search.");
     }
+
+    await sleep(7000);
 
     // --- STEP 3: Wait for Contact Result ---
     const clickableTarget = await waitForElement(
@@ -92,14 +96,14 @@ if (typeof window.waSenderInjected === "undefined") {
       }
     }
 
-    await sleep(1000);
+    await sleep(2000);
 
     // --- STEP 6: Click Send ---
     const sendBtn = document.querySelector(
       'button[aria-label="Send"], span[data-icon="send"]',
     );
     if (!sendBtn) throw new Error("Could not find 'Send' button.");
-    (sendBtn.closest("button") || sendBtn).click();
+    // (sendBtn.closest("button") || sendBtn).click();
 
     await sleep(1500);
     return true;
