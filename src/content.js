@@ -46,7 +46,7 @@ if (typeof window.waSenderInjected === "undefined") {
     
     // --- STEP 2: Find Search Input and Type Number ---
     const searchInput = await waitForElement(
-      'input[aria-label^="Search"]',
+      'input[aria-label^="Search name"]',
       5000,
     );
     if (!searchInput) throw new Error("Could not find search input.");
@@ -88,9 +88,9 @@ if (typeof window.waSenderInjected === "undefined") {
     await sleep(2000);
 
     // Support multiline messages safely
-    const lines = messageText.split("\n");
+    const lines = messageText.split(/\r?\n/);
     for (let i = 0; i < lines.length; i++) {
-      document.execCommand("insertText", false, lines[i]);
+      document.execCommand("insertText", false, lines[i].replace(/\r/g, ""));
       if (i < lines.length - 1) {
         document.execCommand("insertLineBreak");
       }

@@ -5,53 +5,61 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>wa-bulk-extension</title>
-  <script src="/xlsx.full.min.js"></script>
+    <script src="/xlsx.full.min.js"></script>
   </head>
   <body>
     <div id="app">
       <div class="container">
-    <div class="card">
-      <label class="upload-btn">
-        Upload Excel File (.xlsx)
-        <input type="file" id="excelFile" accept=".xlsx, .xls" hidden>
-      </label>
-      <p class="note">Columns needed: <b>Phone, Name, Message</b></p>
-    </div>
 
-    <div class="card settings">
-      <label>Random Delay (Seconds) to avoid ban:</label>
-      <div class="delay-inputs">
-        Min: <input type="number" id="minDelay" value="3" min="1">
-        Max: <input type="number" id="maxDelay" value="7" min="2">
+        <div id="processingSection" style="display:none">
+          <div class="table-container">
+            <h2 class="table-title">Processing List</h2>
+            <div class="table-scroll">
+              <table class="processing-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>NIM</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Act</th>
+                  </tr>
+                </thead>
+                <tbody id="processingBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <button id="terminateAllBtn" class="terminate-btn">Terminate All</button>
+        </div>
+
+        <div id="uploadSection">
+          <div class="card">
+            <label class="upload-btn" id="uploadLabel">
+              Upload Excel File (.xlsx)
+              <input type="file" id="excelFile" accept=".xlsx, .xls" hidden>
+            </label>
+            <p class="note">Columns needed: <b>Phone, Name, Message</b></p>
+          </div>
+
+          <div class="card settings">
+            <label>Random Delay (Seconds) to avoid ban:</label>
+            <div class="delay-inputs">
+              Min: <input type="number" id="minDelay" value="3" min="1">
+              Max: <input type="number" id="maxDelay" value="7" min="2">
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat-box">Total<br><span id="totalCount">0</span></div>
+            <div class="stat-box success">Sent<br><span id="sentCount">0</span></div>
+            <div class="stat-box fail">Failed<br><span id="failCount">0</span></div>
+          </div>
+
+          <button id="startBtn" disabled>Start Campaign</button>
+        </div>
+
+        <div id="statusText">Awaiting file upload...</div>
       </div>
-    </div>
-
-    <div class="stats">
-      <div class="stat-box">Total<br><span id="totalCount">0</span></div>
-      <div class="stat-box success">Sent<br><span id="sentCount">0</span></div>
-      <div class="stat-box fail">Failed<br><span id="failCount">0</span></div>
-    </div>
-
-
-    <div class="table-container">
-    <h2 class="table-title">Failed Contact(s)</h2>
-    
-    <table class="failed-contacts-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Phone</th>
-        </tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
-  </div>
-
-    <button id="startBtn" disabled>Start Campaign</button>
-    <div id="statusText">Awaiting file upload...</div>
-  </div>
-  
     </div>
     <script type="module" src="/src/popup.js"></script>
   </body>

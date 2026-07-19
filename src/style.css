@@ -1,6 +1,6 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  width: 320px;
+  width: 400px;
   margin: 0;
   background-color: #f0f2f5;
   color: #111b21;
@@ -47,66 +47,184 @@ button {
 button:disabled { background-color: #ccc; cursor: not-allowed; }
 #statusText { text-align: center; font-size: 12px; margin-top: 10px; color: #666; }
 
-  .table-container {
-    max-width: 800px;
-    margin: 0 auto;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden; /* Ensures rounded corners apply to the table */
-    padding: 20px;
-  }
+#uploadSection.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
 
-  /* Title/Heading Styling */
-  .table-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #333333;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 10px;
-  }
+.table-container {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 12px;
+  margin-bottom: 12px;
+}
 
-  /* Table Styling */
-  .failed-contacts-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-  }
+.table-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333333;
+  margin: 0 0 10px 0;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+}
 
-  .failed-contacts-table th,
-  .failed-contacts-table td {
-    padding: 12px 15px;
-    border-bottom: 1px solid #e2e8f0;
-  }
+.table-scroll {
+  max-height: 200px;
+  overflow-y: auto;
+}
 
-  /* Header Styling */
-  .failed-contacts-table th {
-    background-color: #f8fafc;
-    color: #475569;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 0.05em;
-  }
+.processing-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
 
-  /* Row Hover Effect */
-  .failed-contacts-table tbody tr:hover {
-    background-color: #f1f5f9;
-    transition: background-color 0.2s ease;
-  }
+.processing-table th,
+.processing-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
 
-  /* Error Badge Styling */
-  .error-badge {
-    background-color: #fee2e2;
-    color: #dc2626;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: 500;
-  }
+.processing-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
 
-  /* Last row border removal */
-  .failed-contacts-table tbody tr:last-child td {
-    border-bottom: none;
-  }
+.processing-table tbody tr:hover {
+  background-color: #f1f5f9;
+}
+
+.processing-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.pending {
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+
+.status-badge.running {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.status-badge.failed {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.status-badge.done {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.act-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+  line-height: 1;
+}
+
+.pause-btn {
+  background-color: #f59e0b;
+  color: white;
+}
+.pause-btn:hover { background-color: #d97706; }
+
+.play-btn {
+  background-color: #00a884;
+  color: white;
+}
+.play-btn:hover { background-color: #059669; }
+
+.retry-btn {
+  background-color: #3b82f6;
+  color: white;
+}
+.retry-btn:hover { background-color: #2563eb; }
+
+.check-icon {
+  color: #00a884;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.terminate-btn {
+  background-color: #ea0038;
+  color: white;
+  border: none;
+  border-radius: 24px;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.terminate-btn:hover { background-color: #c5002e; }
+
+.failed-contacts-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.failed-contacts-table th,
+.failed-contacts-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.failed-contacts-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.failed-contacts-table tbody tr:hover {
+  background-color: #f1f5f9;
+  transition: background-color 0.2s ease;
+}
+
+.error-badge {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.failed-contacts-table tbody tr:last-child td {
+  border-bottom: none;
+}
