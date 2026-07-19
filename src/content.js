@@ -1,15 +1,23 @@
 // 1. GHOST GUARD: Prevents crashes if Chrome injects this file twice
 if (typeof window.waSenderInjected === "undefined") {
   window.waSenderInjected = true;
+  window.waSenderAborted = false;
 
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const sleep = (ms) => new Promise((resolve, reject) => {
+    const start = Date.now();
+    const check = () => {
+      if (window.waSenderAborted) { reject(new Error("Aborted")); return; }
+      if (Date.now() - start >= ms) { resolve(); return; }
+      setTimeout(check, 100);
+    };
+    check();
+  });
 
-  // 2. POLLER: Waits for UI elements instead of crashing instantly
   async function waitForElement(selector, maxWaitTime = 8000) {
     const startTime = Date.now();
     while (Date.now() - startTime < maxWaitTime) {
+      if (window.waSenderAborted) throw new Error("Aborted");
       const element = document.querySelector(selector);
-      // Ensure element exists and is visible
       if (element && element.offsetParent !== null) {
         return element;
       }
@@ -20,15 +28,21 @@ if (typeof window.waSenderInjected === "undefined") {
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "EXECUTE_SEND") {
+      window.waSenderAborted = false;
       executeWhatsAppWorkflow(request.phone, request.message)
         .then(() => sendResponse({ success: true }))
         .catch((err) => {
-          // Force the error to stringify properly so it never reads "undefined" again
           const errorMsg = err?.message || String(err);
-          sendResponse({ success: false, error: errorMsg });
+          sendResponse({ success: false, error: errorMsg, aborted: window.waSenderAborted });
         });
 
-      return true; // CRITICAL: Tells Chrome to keep the port open
+      return true;
+    }
+
+    if (request.action === "ABORT_SEND") {
+      window.waSenderAborted = true;
+      sendResponse({ ok: true });
+      return true;
     }
   });
 
@@ -87,14 +101,10 @@ if (typeof window.waSenderInjected === "undefined") {
     messageBox.focus();
     await sleep(2000);
 
-    // Support multiline messages safely
-    const lines = messageText.split(/\r?\n/);
-    for (let i = 0; i < lines.length; i++) {
-      document.execCommand("insertText", false, lines[i].replace(/\r/g, ""));
-      if (i < lines.length - 1) {
-        document.execCommand("insertLineBreak");
-      }
-    }
+    const cleanText = messageText.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+    const dt = new DataTransfer();
+    dt.setData("text/plain", cleanText);
+    messageBox.dispatchEvent(new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true }));
 
     await sleep(2000);
 
@@ -103,9 +113,8 @@ if (typeof window.waSenderInjected === "undefined") {
       'button[aria-label="Send"], span[data-icon="send"]',
     );
     if (!sendBtn) throw new Error("Could not find 'Send' button.");
-    // (sendBtn.closest("button") || sendBtn).click();
+    (sendBtn.closest("button") || sendBtn).click();
 
-    await sleep(1500);
     return true;
   }
 } else {

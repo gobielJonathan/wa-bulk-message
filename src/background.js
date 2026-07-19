@@ -73,6 +73,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (c) {
       c.campaignStatus = "paused";
       c.shouldStop = true;
+      if (campaignTimers[request.campaignId]) {
+        clearTimeout(campaignTimers[request.campaignId]);
+        delete campaignTimers[request.campaignId];
+      }
+      chrome.tabs.query({ url: "*://web.whatsapp.com/*" }, (tabs) => {
+        if (tabs.length > 0) {
+          chrome.tabs.sendMessage(tabs[0].id, { action: "ABORT_SEND" }, () => {
+            if (chrome.runtime.lastError) {}
+          });
+        }
+      });
       persistCampaigns();
       broadcastUpdate(request.campaignId);
     }
@@ -103,7 +114,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         c.stats.sent = c.contacts.filter((x) => x.status === "done").length;
         persistCampaigns();
         broadcastUpdate(request.campaignId);
-        if (c.campaignStatus === "paused") {
+        if (c.campaignStatus === "paused" || c.campaignStatus === "completed") {
           c.campaignStatus = "running";
           c.shouldStop = false;
           persistCampaigns();
@@ -197,7 +208,7 @@ async function processNextMessage(campaignId) {
           { target: { tabId: waTabId }, files: ["content.js"] },
           () => {
             if (chrome.runtime.lastError) {
-              handleSendResult(campaignId, nextIndex, false, "Script injection failed");
+              handleSendResult(campaignId, nextIndex, false, "Script injection failed", false);
               return;
             }
             setTimeout(() => {
@@ -206,7 +217,8 @@ async function processNextMessage(campaignId) {
                   campaignId,
                   nextIndex,
                   r2 && r2.success,
-                  r2 ? r2.error : "No response"
+                  r2 ? r2.error : "No response",
+                  r2 && r2.aborted
                 );
               });
             }, 500);
@@ -217,19 +229,22 @@ async function processNextMessage(campaignId) {
           campaignId,
           nextIndex,
           response && response.success,
-          response ? response.error : "No response"
+          response ? response.error : "No response",
+          response && response.aborted
         );
       }
     });
   });
 }
 
-function handleSendResult(campaignId, contactIndex, success, error) {
+function handleSendResult(campaignId, contactIndex, success, error, aborted) {
   const c = campaigns[campaignId];
   if (!c) return;
 
-  if (c.shouldStop) {
+  if (c.shouldStop || aborted) {
     c.contacts[contactIndex].status = "pending";
+    persistCampaigns();
+    broadcastUpdate(campaignId);
     return;
   }
 
